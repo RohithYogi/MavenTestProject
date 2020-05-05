@@ -6,14 +6,29 @@ pipeline {
   }
   agent any
   stages {
-    stage('Build') {
-      steps {
-        sh 'mvn clean install'
+    stage('CI - Maven') {
+      agent {
+        docker {
+          image 'maven:3.6.3-jdk-11'
+          args '-v /root/.m2:/root/.m2' 
+        }
       }
-    }
-    stage('Test') {
-      steps {
-        sh 'mvn test'
+      stages {
+        stage('Build') {
+          steps {
+            sh 'mvn -B -DskipTests clean package'
+          }
+        }
+        stage('Test') {
+          steps {
+            sh 'mvn test'
+          }
+           post {
+                always {
+                    junit 'target/surefire-reports/*.xml'
+                }
+            }
+        }
       }
     }
     stage('DockerHub') {
@@ -31,19 +46,6 @@ pipeline {
               docker.withRegistry( '', registryCredential ) {
                 dockerImage.push()
               }
-            }
-          }
-        }
-        stage('Deploy Image') {
-          agent any
-          steps {
-            script {
-              step([$class: "RundeckNotifier",
-              rundeckInstance: "rundeck",
-              options: """
-                BUILD_VERSION=$BUILD_NUMBER
-              """,
-              jobId: "941329f8-ef6c-4f1c-8ccc-2cf6dc2727c8"])
             }
           }
         }
