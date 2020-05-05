@@ -1,38 +1,22 @@
 pipeline {
   environment {
-    registry = "itm2016072/calculator"
+    registry = "imt2016072/calculator"
     registryCredential = 'dockerhub'
     dockerImage = ''
   }
   agent none
   stages {
-    stage('CI - Maven') {
-      agent {
-        docker {
-          image 'maven:3.6.3-jdk-11'
-          args '-v /root/.m2:/root/.m2' 
-        }
-      }
-      stages {
-        stage('Build') {
-          steps {
-            sh 'mvn clean install'
-            sh 'mvn -B -DskipTests clean package'
-          }
-        }
-        stage('Test') {
-          steps {
-            sh 'mvn test'
-          }
-           post {
-                always {
-                    junit 'target/surefire-reports/*.xml'
-                }
-            }
-        }
+    stage('Build') {
+      steps {
+        sh 'mvn clean install'
       }
     }
-    stage('CD - DockerHub') {
+    stage('Test') {
+      steps {
+        sh 'mvn test'
+      }
+    }
+    stage('DockerHub') {
       stages{
         stage('Building image') {
           steps{
@@ -41,7 +25,7 @@ pipeline {
             }
           }
         }
-        stage('Publish Image') {
+        stage('Deploy Image') {
           steps{
             script {
               docker.withRegistry( '', registryCredential ) {
@@ -50,9 +34,8 @@ pipeline {
             }
           }
         }
-      } 
-    }
-    stage('Deploy') {
+      }
+      stage('Deploy') {
       agent any
       steps {
         script {
@@ -67,3 +50,5 @@ pipeline {
     }
   }
 }
+    
+
