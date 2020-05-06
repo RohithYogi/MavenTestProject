@@ -40,15 +40,6 @@ pipeline {
             }
           }
         }
-        stage('Publish Image') {
-          steps{
-            script {
-              docker.withRegistry( '', registryCredential ) {
-                dockerImage.push()
-              }
-            }
-          }
-        }
       } 
     }
     stage('Deploy') {
