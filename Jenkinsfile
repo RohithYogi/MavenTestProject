@@ -3,9 +3,15 @@ pipeline {
     registry = "imt2016072/calculator"
     registryCredential = 'dockerhub'
     dockerImage = ''
+    dockerImageLatest = ''
   }
   agent any
   stages {
+    stage('Cloning - Git'){
+      steps{
+        git 'https://github.com/RohithYogi/MavenTestProject.git'
+      }
+    }
     stage('CI - Maven') {
       agent {
         docker {
@@ -37,6 +43,7 @@ pipeline {
           steps{
             script {
               dockerImage = docker.build registry + ":$BUILD_NUMBER"
+              dockerImageLatest = docker.build registry +":latest"
             }
           }
         }
@@ -45,6 +52,7 @@ pipeline {
             script {
               docker.withRegistry( '', registryCredential ) {
                 dockerImage.push()
+                dockerImageLatest.push()
               }
             }
           }
