@@ -14,7 +14,8 @@ public class Calculator {
 			System.out.println("Select an option:");
 			System.out.println("\t1 - Addition\n\t2 - Subtraction\n\t3 - Multiplication\n\t4 - Division\n\t0 - Exit");
 			System.out.println("Select an option:");
-			int option = in.nextInt();
+			int option;
+			if(in.hasNext()) option = in.nextInt();
 
 			if(option < 0 || option > 4){
 				System.out.println("Not a valid selection: " + Integer.toString(option) + "\ntry again!!");
@@ -27,9 +28,9 @@ public class Calculator {
 			else{
 				int num1, num2;
 				System.out.println("Enter first number: ");
-				num1 = in.nextInt();
+				if(in.hasNext()) num1 = in.nextInt();
 				System.out.println("Enter second number: ");
-				num2 = in.nextInt();
+				if(in.hasNext()) num2 = in.nextInt();
 
 				switch (option) {
 					case 1:
